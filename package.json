@@ -1,0 +1,15 @@
+{
+  "name": "vwmbasic",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "logcat": "adb logcat *:S ReactNative:V ReactNativeJS:V"
+  },
+  "dependencies": {
+    "lodash": "^4.13.1",
+    "react": "15.0.2",
+    "react-native": "0.26.3",
+    "underscore": "^1.8.3"
+  }
+}

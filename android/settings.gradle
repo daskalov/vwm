@@ -1,0 +1,3 @@
+rootProject.name = 'vwmbasic'
+
+include ':app'
