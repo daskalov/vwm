@@ -5,18 +5,15 @@ import {
   Text,
   View,
   TouchableHighlight,
+  Navigator,
 } from 'react-native';
 
-// import _ from 'lodash';
-
-// var _ = require('lodash');
-
 import _ from 'underscore';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 class VWMGridSquare extends Component {
   constructor(props) {
     super(props);
-    console.log('!!! constructor');
     this.state = {
       active: false
     };
@@ -31,7 +28,7 @@ class VWMGridSquare extends Component {
   render() {
     const gridDot = <View style={styles.gridDot} />;
     return (
-      <TouchableHighlight onPress={this.tap.bind(this)}>
+      <TouchableHighlight onPress={this.tap.bind(this)} underlayColor={colors.none}>
         <View style={styles.gridSquare}>
           { (this.state.active) ? gridDot : null }
         </View>
@@ -58,17 +55,82 @@ class VWMGrid extends Component {
   }
 }
 
-class vwmbasic extends Component {
+class VWM extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <VWMGrid rows={4} cols={4} />
+        <Icon.ToolbarAndroid
+          title="Assessments"
+          titleColor='white'
+          style={styles.toolbar} />
+        <View style={styles.containerContent}>
+          <VWMGrid rows={4} cols={4} />
+        </View>
       </View>
     );
   }
 }
 
+class Assessments extends Component {
+  tapMenu() {
+    this.props.navigator.push({
+      name: 'VWM'
+    });
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <Icon.ToolbarAndroid
+          title="EMA"
+          titleColor='white'
+          style={styles.toolbar} />
+        <View style={styles.containerContent}>
+          <TouchableHighlight onPress={this.tapMenu.bind(this)}>
+            <View style={styles.buttonMenu}>
+              <Text>
+                Visual Working Memory
+              </Text>
+            </View>
+          </TouchableHighlight>
+        </View>
+      </View>
+    );
+  }
+}
+
+class NavigatorMain extends Component {
+  navigatorRenderScene(route, navigator) {
+    const component = {
+      'VWM':         <VWM route={route} navigator={navigator}/>,
+      'Assessments': <Assessments route={route} navigator={navigator}/>
+    }[route.name];
+    return component;
+  }
+
+  render() {
+    const initialRoute = {
+      name: 'Assessments'
+    };
+    return (
+      <Navigator
+        initialRoute={initialRoute}
+        renderScene={this.navigatorRenderScene}
+      />
+    );
+  }
+}
+
+class vwmbasic extends Component {
+  render() {
+    return (
+      <NavigatorMain />
+    );
+  }
+}
+
 const colors = {
+  none:        '#00000000',
   bg:          '#EEEEEE',
   primary:     '#F44336',
   primaryDark: '#C62828',
@@ -78,9 +140,25 @@ const colors = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    alignItems: 'stretch',
+    backgroundColor: colors.bg,
+  },
+
+  toolbar: {
+    height: 56,
+    backgroundColor: colors.primary
+  },
+
+  containerContent: {
+    paddingTop: 8,
+    paddingHorizontal: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.bg,
+  },
+
+  buttonMenu: {
+    backgroundColor: 'white',
+    padding: 8
   },
 
   grid: {
@@ -106,7 +184,6 @@ const styles = StyleSheet.create({
     margin: 10,
     borderRadius: 200,
   }
-
 });
 
 AppRegistry.registerComponent('vwmbasic', () => vwmbasic);
