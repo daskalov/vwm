@@ -11,6 +11,11 @@ import {
 import _ from 'underscore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import { Provider, connect } from 'react-redux';
+import { createStore, combineReducers, bindActionCreators } from 'redux';
+import * as vwmActions from './src/actions/vwm';
+import * as reducers from './src/reducers';
+
 class VWMGridSquare extends Component {
   constructor(props) {
     super(props);
@@ -115,16 +120,38 @@ class NavigatorMain extends Component {
     return (
       <Navigator
         initialRoute={initialRoute}
-        renderScene={this.navigatorRenderScene}
+        renderScene={this.navigatorRenderScene.bind(this)}
       />
     );
   }
 }
 
+const mapStateToProps = function (state) {
+  return {
+    state: state.vwm
+  };
+};
+
+const mapDispatchToProps = function (dispatch) {
+  return {
+    actions: bindActionCreators(vwmActions, dispatch)
+  };
+};
+
+const ReduxNavigatorMain = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(NavigatorMain);
+
+const rootReducer = combineReducers(reducers);
+const store = createStore(rootReducer);
+
 class vwmbasic extends Component {
   render() {
     return (
-      <NavigatorMain />
+      <Provider store={store}>
+        <ReduxNavigatorMain />
+      </Provider>
     );
   }
 }
