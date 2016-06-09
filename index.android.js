@@ -21,6 +21,10 @@ class VWMGridSquare extends Component {
     actions.gridTap(row, col);
   }
 
+  shouldComponentUpdate(nextProps) {
+    return nextProps.active != this.props.active;
+  }
+
   render() {
     const gridDot = <View style={styles.gridDot} />;
     return (
