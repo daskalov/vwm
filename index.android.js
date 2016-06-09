@@ -17,17 +17,9 @@ import * as vwmActions from './src/actions/vwm';
 import * as reducers from './src/reducers';
 
 class VWMGridSquare extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      active: false
-    };
-  }
-
   tap() {
-    this.setState({
-      active: ! this.state.active
-    });
+    const { actions, row, col } = this.props;
+    actions.gridTap(row, col);
   }
 
   render() {
@@ -35,7 +27,7 @@ class VWMGridSquare extends Component {
     return (
       <TouchableHighlight onPress={this.tap.bind(this)} underlayColor={colors.none}>
         <View style={styles.gridSquare}>
-          { (this.state.active) ? gridDot : null }
+          { (this.props.active) ? gridDot : null }
         </View>
       </TouchableHighlight>
     );
@@ -46,10 +38,15 @@ class VWMGrid extends Component {
   render() {
     return (
       <View style={styles.grid}>
-        { _.range(0, this.props.rows).map((row) =>
-            <View style={styles.gridRow} key={row}>
-              { _.range(0, this.props.cols).map((col) =>
-                  <VWMGridSquare key={col}/>
+        { this.props.state.map((row, i) =>
+            <View style={styles.gridRow} key={i}>
+              { row.map((col, j) =>
+                  <VWMGridSquare
+                    active={col}
+                    actions={this.props.actions}
+                    row={i}
+                    col={j}
+                    key={j}/>
                 )
               }
             </View>
@@ -62,6 +59,8 @@ class VWMGrid extends Component {
 
 class VWM extends Component {
   render() {
+    const stateGrid = this.props.state.recall,
+          actions   = this.props.actions;
     return (
       <View style={styles.container}>
         <Icon.ToolbarAndroid
@@ -69,7 +68,7 @@ class VWM extends Component {
           titleColor='white'
           style={styles.toolbar} />
         <View style={styles.containerContent}>
-          <VWMGrid rows={4} cols={4} />
+          <VWMGrid state={stateGrid} actions={actions} />
         </View>
       </View>
     );
@@ -107,15 +106,25 @@ class Assessments extends Component {
 class NavigatorMain extends Component {
   navigatorRenderScene(route, navigator) {
     const component = {
-      'VWM':         <VWM route={route} navigator={navigator}/>,
-      'Assessments': <Assessments route={route} navigator={navigator}/>
+      'VWM':
+        <VWM
+          route={route}
+          navigator={navigator}
+          state={this.props.state}
+          actions={this.props.actions} />,
+      'Assessments':
+        <Assessments
+          route={route}
+          navigator={navigator}
+          state={this.props.state}
+          actions={this.props.actions} />,
     }[route.name];
     return component;
   }
 
   render() {
     const initialRoute = {
-      name: 'Assessments'
+      name: 'VWM'
     };
     return (
       <Navigator
