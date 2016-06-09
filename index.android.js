@@ -8,7 +8,6 @@ import {
   Navigator,
 } from 'react-native';
 
-import _ from 'underscore';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { Provider, connect } from 'react-redux';
@@ -75,6 +74,23 @@ class VWM extends Component {
   }
 }
 
+const mapStateToProps = function (state) {
+  return {
+    state: state.vwm
+  };
+};
+
+const mapDispatchToProps = function (dispatch) {
+  return {
+    actions: bindActionCreators(vwmActions, dispatch)
+  };
+};
+
+const ReduxVWM = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(VWM);
+
 class Assessments extends Component {
   tapMenu() {
     this.props.navigator.push({
@@ -107,17 +123,9 @@ class NavigatorMain extends Component {
   navigatorRenderScene(route, navigator) {
     const component = {
       'VWM':
-        <VWM
-          route={route}
-          navigator={navigator}
-          state={this.props.state}
-          actions={this.props.actions} />,
+        <ReduxVWM route={route} navigator={navigator} />,
       'Assessments':
-        <Assessments
-          route={route}
-          navigator={navigator}
-          state={this.props.state}
-          actions={this.props.actions} />,
+        <Assessments route={route} navigator={navigator} />,
     }[route.name];
     return component;
   }
@@ -135,23 +143,6 @@ class NavigatorMain extends Component {
   }
 }
 
-const mapStateToProps = function (state) {
-  return {
-    state: state.vwm
-  };
-};
-
-const mapDispatchToProps = function (dispatch) {
-  return {
-    actions: bindActionCreators(vwmActions, dispatch)
-  };
-};
-
-const ReduxNavigatorMain = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(NavigatorMain);
-
 const rootReducer = combineReducers(reducers);
 const store = createStore(rootReducer);
 
@@ -159,7 +150,7 @@ class vwmbasic extends Component {
   render() {
     return (
       <Provider store={store}>
-        <ReduxNavigatorMain />
+        <NavigatorMain />
       </Provider>
     );
   }
