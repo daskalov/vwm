@@ -4,7 +4,6 @@ import {
   Text,
   View,
   TouchableHighlight,
-  Navigator,
 } from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';

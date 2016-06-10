@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
 import {
   AppRegistry,
-  StyleSheet,
-  Text,
-  View,
-  TouchableHighlight,
   Navigator,
 } from 'react-native';
 
@@ -15,34 +11,8 @@ import { createStore, combineReducers } from 'redux';
 import * as reducers from './src/reducers';
 
 import VWM from './src/containers/VWM';
+import Assessments from './src/components/Assessments';
 
-class Assessments extends Component {
-  tapMenu() {
-    this.props.navigator.push({
-      name: 'VWM'
-    });
-  }
-
-  render() {
-    return (
-      <View style={styles.container}>
-        <Icon.ToolbarAndroid
-          title="EMA"
-          titleColor='white'
-          style={styles.toolbar} />
-        <View style={styles.containerContent}>
-          <TouchableHighlight onPress={this.tapMenu.bind(this)}>
-            <View style={styles.buttonMenu}>
-              <Text>
-                Visual Working Memory
-              </Text>
-            </View>
-          </TouchableHighlight>
-        </View>
-      </View>
-    );
-  }
-}
 
 class NavigatorMain extends Component {
   navigatorRenderScene(route, navigator) {
@@ -80,12 +50,5 @@ class vwmbasic extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  buttonMenu: {
-    backgroundColor: 'white',
-    padding: 8
-  },
-});
 
 AppRegistry.registerComponent('vwmbasic', () => vwmbasic);
