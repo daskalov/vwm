@@ -71,8 +71,10 @@ const styles = StyleSheet.create(
 
 class VWMGridSquare extends Component {
   tap() {
-    const { actions, row, col } = this.props;
-    actions.gridTap(row, col);
+    const { actions, row, col, readOnly } = this.props;
+    if (! readOnly) {
+      actions.gridTap(row, col);
+    }
   }
 
   shouldComponentUpdate(nextProps) {
@@ -91,23 +93,37 @@ class VWMGridSquare extends Component {
   }
 }
 
-const VWMGrid = ({ state, actions }) =>
-  <View style={styles.grid}>
-    { state.map((row, i) =>
-        <View style={styles.gridRow} key={i}>
-          { row.map((col, j) =>
-              <VWMGridSquare
-                active={col}
-                actions={actions}
-                row={i}
-                col={j}
-                key={j}/>
-            )
-          }
-        </View>
-      )
+class VWMGrid extends Component {
+  componentDidMount() {
+    if (this.props.training) {
+      const { then, time } = this.props.training;
+      setTimeout(then, time);
     }
-  </View>;
+  }
+
+  render() {
+    const { state, actions, training } = this.props;
+    return (
+      <View style={styles.grid}>
+        { state.map((row, i) =>
+            <View style={styles.gridRow} key={i}>
+              { row.map((col, j) =>
+                  <VWMGridSquare
+                    active={col}
+                    actions={actions}
+                    readOnly={training !== undefined}
+                    row={i}
+                    col={j}
+                    key={j}/>
+                )
+              }
+            </View>
+          )
+        }
+      </View>
+    );
+  }
+}
 
 const Button = ({ children, display, onPress }) => display ?
   <TouchableHighlight onPress={onPress} underlayColor={colors.none}>
@@ -149,10 +165,20 @@ class VWM extends Component {
   constructor(props) {
     super(props);
     const advance = this.next.bind(this);
+
+    const O = false,
+          X = true;
+    const filledState = [
+      [O, O, O, X],
+      [O, X, X, O],
+      [O, O, O, X],
+      [O, O, O, O],
+    ];
+
     const screensAll = [
       <VWMInstructions
           continueText="Start"
-          continueDelay={2000}
+          continueDelay={250}
           onContinue={advance}>
         <Text style={styles.instructions}>
           You'll see between 1 and 4 grids.
@@ -163,9 +189,18 @@ class VWM extends Component {
           Try to remember the pattern in the last grid presented.
         </Text>
       </VWMInstructions>,
+
+      <VWMGrid
+        state={filledState}
+        training={{
+          time: 1000,
+          then: advance
+        }} />,
+
       (props) =>
         <VWMGrid state={props.state.recall} actions={props.actions} />,
     ];
+
     const screenCurr = screensAll.shift();
     this.state = {
       screens: screensAll,
