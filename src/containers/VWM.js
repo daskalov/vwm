@@ -39,7 +39,30 @@ const stylesLocal = {
     flex: 1,
     margin: 10,
     borderRadius: 200,
+  },
+
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 4,
+    padding: 16,
+  },
+
+  instructions: {
+    marginBottom: 8,
+  },
+
+  button: {
+    backgroundColor: colors.accent,
+    padding: 8,
+    marginTop: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+
+  buttonText: {
+    color: 'white'
   }
+
 };
 
 const styles = StyleSheet.create(
@@ -68,33 +91,107 @@ class VWMGridSquare extends Component {
   }
 }
 
-class VWMGrid extends Component {
+const VWMGrid = ({ state, actions }) =>
+  <View style={styles.grid}>
+    { state.map((row, i) =>
+        <View style={styles.gridRow} key={i}>
+          { row.map((col, j) =>
+              <VWMGridSquare
+                active={col}
+                actions={actions}
+                row={i}
+                col={j}
+                key={j}/>
+            )
+          }
+        </View>
+      )
+    }
+  </View>;
+
+const Button = ({ children, display, onPress }) => display ?
+  <TouchableHighlight onPress={onPress} underlayColor={colors.none}>
+    <View style={styles.button}>
+      {children}
+    </View>
+  </TouchableHighlight> : null;
+
+class VWMInstructions extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      canProceed: false
+    };
+  }
+
+  componentDidMount() {
+    setTimeout(() =>
+      this.setState({ canProceed: true })
+    , this.props.continueDelay || 0);
+  }
+
   render() {
+    const { children, onContinue, continueText } = this.props;
     return (
-      <View style={styles.grid}>
-        { this.props.state.map((row, i) =>
-            <View style={styles.gridRow} key={i}>
-              { row.map((col, j) =>
-                  <VWMGridSquare
-                    active={col}
-                    actions={this.props.actions}
-                    row={i}
-                    col={j}
-                    key={j}/>
-                )
-              }
-            </View>
-          )
-        }
+      <View style={styles.card}>
+        {children}
+        <Button display={this.state.canProceed} onPress={onContinue}>
+          <Text style={styles.buttonText}>
+            {continueText}
+          </Text>
+        </Button>
       </View>
     );
   }
 }
 
 class VWM extends Component {
+  constructor(props) {
+    super(props);
+    const advance = this.next.bind(this);
+    const screensAll = [
+      <VWMInstructions
+          continueText="Start"
+          continueDelay={2000}
+          onContinue={advance}>
+        <Text style={styles.instructions}>
+          You'll see between 1 and 4 grids.
+          Each grid will remain on the screen
+          for 1 second.
+        </Text>
+        <Text style={styles.instructions}>
+          Try to remember the pattern in the last grid presented.
+        </Text>
+      </VWMInstructions>,
+      (props) =>
+        <VWMGrid state={props.state.recall} actions={props.actions} />,
+    ];
+    const screenCurr = screensAll.shift();
+    this.state = {
+      screens: screensAll,
+      screenCurrent: screenCurr,
+      screensSeen: []
+    };
+  }
+
+  next() {
+    const { screens, screenCurr, screensSeen } = this.state;
+    screensSeen.push(screenCurr);
+    const screenNewCurr = screens.shift();
+    this.setState({
+      screens: screens,
+      screenCurrent: screenNewCurr,
+      screensSeen: screensSeen
+    });
+  }
+
+  renderCurrentScreen() {
+    const screenCurr = this.state.screenCurrent;
+    return (typeof screenCurr === 'function') ?
+      screenCurr(this.props) : screenCurr;
+  }
+
   render() {
-    const stateGrid = this.props.state.recall,
-          actions   = this.props.actions;
     return (
       <View style={styles.container}>
         <Icon.ToolbarAndroid
@@ -102,7 +199,7 @@ class VWM extends Component {
           titleColor='white'
           style={styles.toolbar} />
         <View style={styles.containerContent}>
-          <VWMGrid state={stateGrid} actions={actions} />
+          {this.renderCurrentScreen.apply(this)}
         </View>
       </View>
     );
