@@ -197,11 +197,16 @@ class VWM extends Component {
   }
 
   generateRandomState(rows, cols) {
-    return _.range(0, rows).map((_row) =>
-      _.range(0, cols).map((_col) =>
-        this.randomInt(0, 2) ? true : false
-      )
+    const grid = _.range(0, rows).map((_row) =>
+      _.range(0, cols).map((_col) => false)
     );
+    let dots = 0;
+    while (dots < 5) {
+      const r = this.randomInt(0, rows-1),
+            c = this.randomInt(0, cols-1);
+      grid[r][c] = grid[r][c] ? true : ++dots && true;
+    }
+    return grid;
   }
 
   generateRandomTrainingStates(fnAdvance) {
