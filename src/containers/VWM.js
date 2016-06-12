@@ -6,6 +6,8 @@ import {
   TouchableHighlight,
 } from 'react-native';
 
+import _ from 'underscore';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { connect } from 'react-redux';
@@ -62,7 +64,6 @@ const stylesLocal = {
   buttonText: {
     color: 'white'
   }
-
 };
 
 const styles = StyleSheet.create(
@@ -165,17 +166,7 @@ class VWM extends Component {
   constructor(props) {
     super(props);
     const advance = this.next.bind(this);
-
-    const O = false,
-          X = true;
-    const filledState = [
-      [O, O, O, X],
-      [O, X, X, O],
-      [O, O, O, X],
-      [O, O, O, O],
-    ];
-
-    const screensAll = [
+    const screensAll = _.flatten([
       <VWMInstructions
           continueText="Start"
           continueDelay={250}
@@ -189,24 +180,43 @@ class VWM extends Component {
           Try to remember the pattern in the last grid presented.
         </Text>
       </VWMInstructions>,
-
-      <VWMGrid
-        state={filledState}
-        training={{
-          time: 1000,
-          then: advance
-        }} />,
-
+      this.generateRandomTrainingStates(advance),
       (props) =>
         <VWMGrid state={props.state.recall} actions={props.actions} />,
-    ];
-
+    ]);
     const screenCurr = screensAll.shift();
     this.state = {
       screens: screensAll,
       screenCurrent: screenCurr,
       screensSeen: []
     };
+  }
+
+  randomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  generateRandomState(rows, cols) {
+    return _.range(0, rows).map((_row) =>
+      _.range(0, cols).map((_col) =>
+        this.randomInt(0, 2) ? true : false
+      )
+    );
+  }
+
+  generateRandomTrainingStates(fnAdvance) {
+    const maxTrainings = this.randomInt(1, 4);
+    return _.range(0, maxTrainings).map((idxTraining) => {
+      return (
+        <VWMGrid
+          state={this.generateRandomState(4, 4)}
+          key={idxTraining}
+          training={{
+            time: 1000,
+            then: fnAdvance
+          }} />
+      );
+    });
   }
 
   next() {
