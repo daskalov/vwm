@@ -166,10 +166,11 @@ class VWM extends Component {
   constructor(props) {
     super(props);
     const advance = this.next.bind(this);
+
     const screensAll = _.flatten([
       <VWMInstructions
           continueText="Start"
-          continueDelay={250}
+          continueDelay={200}
           onContinue={advance}>
         <Text style={styles.instructions}>
           You'll see between 1 and 4 grids.
@@ -181,9 +182,21 @@ class VWM extends Component {
         </Text>
       </VWMInstructions>,
       this.generateRandomTrainingStates(advance),
+      <VWMInstructions
+          continueText="Start"
+          continueDelay={200}
+          onContinue={advance}>
+        <Text style={styles.instructions}>
+          You'll now see a blank grid. Tap the squares
+          to create the pattern that matches the last
+          one you saw. You will have 5 seconds to
+          complete this grid.
+        </Text>
+      </VWMInstructions>,
       (props) =>
         <VWMGrid state={props.state.recall} actions={props.actions} />,
     ]);
+
     const screenCurr = screensAll.shift();
     this.state = {
       screens: screensAll,
