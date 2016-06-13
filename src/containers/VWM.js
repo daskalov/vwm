@@ -104,23 +104,33 @@ class VWMGrid extends Component {
 
   render() {
     const { state, actions, training } = this.props;
+    const sumActive = _.flatten(state).reduce((m, e) => e ? m + 1 : m, 0),
+          canProceed = sumActive >= 5;
+    const isTraining = training !== undefined;
     return (
-      <View style={styles.grid}>
-        { state.map((row, i) =>
-            <View style={styles.gridRow} key={i}>
-              { row.map((col, j) =>
-                  <VWMGridSquare
-                    active={col}
-                    actions={actions}
-                    readOnly={training !== undefined}
-                    row={i}
-                    col={j}
-                    key={j}/>
-                )
-              }
-            </View>
-          )
-        }
+      <View>
+        <View style={styles.grid}>
+          { state.map((row, i) =>
+              <View style={styles.gridRow} key={i}>
+                { row.map((col, j) =>
+                    <VWMGridSquare
+                      active={col}
+                      actions={actions}
+                      readOnly={isTraining}
+                      row={i}
+                      col={j}
+                      key={j}/>
+                  )
+                }
+              </View>
+            )
+          }
+        </View>
+        <Button display={canProceed && !isTraining} onPress={() => {}}>
+          <Text style={styles.buttonText}>
+            Done
+          </Text>
+        </Button>
       </View>
     );
   }
@@ -170,7 +180,7 @@ class VWM extends Component {
     const screensAll = _.flatten([
       <VWMInstructions
           continueText="Start"
-          continueDelay={200}
+          continueDelay={2000}
           onContinue={advance}>
         <Text style={styles.instructions}>
           You'll see between 1 and 4 grids.
@@ -181,10 +191,13 @@ class VWM extends Component {
           Try to remember the pattern in the last grid presented.
         </Text>
       </VWMInstructions>,
-      this.generateRandomTrainingStates(advance),
+      this.generateRandomTrainingStates({
+        fnAdvance: advance,
+        timeDisplay: 500
+      }),
       <VWMInstructions
           continueText="Start"
-          continueDelay={200}
+          continueDelay={5000}
           onContinue={advance}>
         <Text style={styles.instructions}>
           You'll now see a blank grid. Tap the squares
@@ -222,7 +235,7 @@ class VWM extends Component {
     return grid;
   }
 
-  generateRandomTrainingStates(fnAdvance) {
+  generateRandomTrainingStates({ fnAdvance, timeDisplay }) {
     const maxTrainings = this.randomInt(1, 4);
     return _.range(0, maxTrainings).map((idxTraining) => {
       return (
@@ -230,7 +243,7 @@ class VWM extends Component {
           state={this.generateRandomState(4, 4)}
           key={idxTraining}
           training={{
-            time: 1000,
+            time: timeDisplay || 1000,
             then: fnAdvance
           }} />
       );
