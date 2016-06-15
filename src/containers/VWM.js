@@ -18,58 +18,6 @@ import colors from '../values/colors';
 import stylesCommon from '../values/styles';
 
 
-const stylesLocal = {
-  grid: {
-    flexDirection: 'column',
-    padding: 4,
-  },
-
-  gridRow: {
-    flexDirection: 'row',
-  },
-
-  gridSquare: {
-    backgroundColor: 'white',
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    margin: 4,
-  },
-
-  gridDot: {
-    backgroundColor: colors.primary,
-    flex: 1,
-    margin: 10,
-    borderRadius: 200,
-  },
-
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 4,
-    padding: 16,
-  },
-
-  instructions: {
-    marginBottom: 8,
-  },
-
-  button: {
-    backgroundColor: colors.accent,
-    padding: 8,
-    marginTop: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-
-  buttonText: {
-    color: 'white'
-  }
-};
-
-const styles = StyleSheet.create(
-  Object.assign(stylesCommon, stylesLocal)
-);
-
 class VWMGridSquare extends Component {
   tap() {
     const { actions, row, col, readOnly } = this.props;
@@ -281,6 +229,60 @@ class VWM extends Component {
     );
   }
 }
+
+// Move styles
+const stylesLocal = {
+  grid: {
+    flexDirection: 'column',
+    padding: 4,
+  },
+
+  gridRow: {
+    flexDirection: 'row',
+  },
+
+  gridSquare: {
+    backgroundColor: 'white',
+    width: 80,
+    height: 80,
+    borderRadius: 10,
+    margin: 4,
+  },
+
+  gridDot: {
+    backgroundColor: colors.primary,
+    flex: 1,
+    margin: 10,
+    borderRadius: 200,
+  },
+
+  card: {
+    backgroundColor: 'white',
+    borderRadius: 4,
+    padding: 16,
+  },
+
+  instructions: {
+    marginBottom: 8,
+  },
+
+  button: {
+    backgroundColor: colors.accent,
+    padding: 8,
+    marginTop: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+
+  buttonText: {
+    color: 'white'
+  }
+};
+
+const styles = StyleSheet.create(
+  Object.assign(stylesCommon, stylesLocal)
+);
+
 
 const mapStateToProps = function (state) {
   return {

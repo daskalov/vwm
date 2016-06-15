@@ -11,17 +11,6 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import stylesCommon from '../values/styles';
 
 
-const stylesLocal = {
-  buttonMenu: {
-    backgroundColor: 'white',
-    padding: 8
-  },
-};
-
-const styles = StyleSheet.create(
-  Object.assign(stylesCommon, stylesLocal)
-);
-
 class Assessments extends Component {
   tapMenu() {
     this.props.navigator.push({
@@ -49,5 +38,17 @@ class Assessments extends Component {
     );
   }
 }
+
+const stylesLocal = {
+  buttonMenu: {
+    backgroundColor: 'white',
+    padding: 8
+  },
+};
+
+const styles = StyleSheet.create(
+  Object.assign(stylesCommon, stylesLocal)
+);
+
 
 export default Assessments;
